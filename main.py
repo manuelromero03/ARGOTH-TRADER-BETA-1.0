@@ -1,27 +1,28 @@
-# main.py
-# Código base para ARGOTH - inicio de tu bot de trading
-
-# Importar funciones de utilidades (que crearemos después)
-from utils_mt5 import get_price_mt5
-from utils_sim import calculate_ema, calculate_rsi
-from utils_ibkr import save_trade_to_db
+from trading_interface import get_current_price, calculate_indicators, place_trade, get_historical_data, MT5_AVAILABLE
+import pandas as pd
 
 def main():
-    symbol = "BTCUSDT"  # Puedes cambiar al activo que quieras
-    # Obtener precios
-    prices = get_price_mt5(symbol, n=200)  # Últimos 200 precios
+    # Obtener datos históricos
+    data = get_historical_data()
 
     # Calcular indicadores
-    ema50 = calculate_ema(prices, 50)
-    ema200 = calculate_ema(prices, 200)
-    rsi14 = calculate_rsi(prices, 14)
+    data = calculate_indicators(data)
 
-    # Mostrar información
-    print(f"Precio actual: {prices[-1]}")
-    print(f"EMA50: {ema50[-1]}, EMA200: {ema200[-1]}, RSI14: {rsi14[-1]}")
+    # Tomar la última fila
+    last_row = data.iloc[-1]
+    price = last_row["Close"]
+    ema50 = last_row["EMA50"]
+    ema200 = last_row["EMA200"]
+    rsi14 = last_row["RSI14"]
 
-    # Guardar trade de ejemplo
-    save_trade_to_db(symbol, "COMPRA", prices[-1])
+    print(f"Modo: {'MT5' if MT5_AVAILABLE else 'SIMULADOR'}")
+    print(f"Precio actual: {price}")
+    print(f"EMA50: {ema50}, EMA200: {ema200}, RSI14: {rsi14}")
+
+    # Estrategia simple: EMA50 cruza EMA200
+    trade_type = "COMPRA" if ema50 > ema200 else "VENTA"
+    place_trade("BTCUSDT", trade_type, price)
+    print(f"✅ Trade guardado: BTCUSDT - {trade_type} @ {price}")
 
 if __name__ == "__main__":
     main()
