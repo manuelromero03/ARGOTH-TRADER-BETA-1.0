@@ -1,24 +1,30 @@
-# utils_sim.py 
-# Modulo con funciones para calcular tecnicos (EMA, RSI) 
+# utils_sim.py
+import pandas as pd
+import numpy as np
+import datetime
 
-import pandas as pd 
-
-def calculate_ema(prices, period):
+def get_historical_data(symbol="BTCUSDT", bars=500, timeframe="1m"):
     """
-    Calcula la media movil exponecial (EMA)
+    Devuelve datos históricos simulados para testing.
     """
-    series = pd.Series(prices)
-    ema = series.ewm(span=period, adjust=False).mean()
-    return ema.tolist()
+    now = datetime.datetime.now()
+    dates = pd.date_range(end=now, periods=bars, freq='T')  # 'T' = minutos
+    prices = np.cumsum(np.random.randn(bars)) + 50000  # precio inicial 50k
 
-def calculate_rsi(prices, period=14):
-    """Calcula el RSI (Relative Strength Index)"""
-    series = pd.Series(prices)
-    delta = series.diff()
-    gain = delta.clip(lower=0)
-    loss = -1 * delta.clip(upper=0)
-    avg_gain = gain.rolling(window=period).mean()
-    avg_loss = loss.rolling(window=period).mean()
-    rs = avg_gain / avg_loss
-    rsi = 100 - (100 / (1 + rs))
-    return rsi.fillna(0).tolist()
+    df = pd.DataFrame({
+        "time": dates,
+        "Open": prices + np.random.randn(bars),
+        "High": prices + np.random.rand(bars)*10,
+        "Low": prices - np.random.rand(bars)*10,
+        "Close": prices,
+        "Volume": np.random.randint(1, 10, size=bars)
+    })
+
+    return df
+
+def place_trade(symbol, trade_type, price, volume=0.01):
+    """
+    Simula la ejecución de un trade
+    """
+    print(f"💹 [SIMULADOR] Trade ejecutado: {trade_type} {symbol} @ {price}")
+    return True
