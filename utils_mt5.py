@@ -2,6 +2,9 @@
 import pandas as pd
 import MetaTrader5 as mt5
 
+# ==============================
+# 🔹 Obtener datos históricos
+# ==============================
 def get_historical_data(symbol="EURUSD", timeframe=mt5.TIMEFRAME_M1, bars=500):
     """
     Obtiene datos históricos desde MetaTrader5
@@ -20,9 +23,13 @@ def get_historical_data(symbol="EURUSD", timeframe=mt5.TIMEFRAME_M1, bars=500):
     df["time"] = pd.to_datetime(df["time"], unit="s")
     return df
 
-def place_trade(symbol, trade_type, price, volume=0.01):
+# ==============================
+# 🔹 Ejecutar trade con TP/SL
+# ==============================
+def place_trade(symbol, trade_type, price, volume=0.01, take_profit=None, stop_loss=None):
     """
-    Ejecuta un trade en MT5
+    Ejecuta un trade en MT5, opcional con TP y SL.
+    take_profit / stop_loss se pasan como porcentaje (0.01 = 1%)
     """
     if not mt5.initialize():
         print("❌ No se pudo inicializar MT5")
@@ -30,10 +37,19 @@ def place_trade(symbol, trade_type, price, volume=0.01):
 
     if trade_type.upper() in ["COMPRA", "BUY"]:
         order_type = mt5.ORDER_TYPE_BUY
+        if take_profit:
+            tp_price = price * (1 + take_profit)
+        if stop_loss:
+            sl_price = price * (1 - stop_loss)
     elif trade_type.upper() in ["VENTA", "SELL"]:
         order_type = mt5.ORDER_TYPE_SELL
+        if take_profit:
+            tp_price = price * (1 - take_profit)
+        if stop_loss:
+            sl_price = price * (1 + stop_loss)
     else:
         print("❌ Tipo de trade inválido")
+        mt5.shutdown()
         return False
 
     request = {
@@ -49,6 +65,12 @@ def place_trade(symbol, trade_type, price, volume=0.01):
         "type_filling": mt5.ORDER_FILLING_IOC,
     }
 
+    # Añadir TP/SL si existen
+    if take_profit:
+        request["tp"] = tp_price
+    if stop_loss:
+        request["sl"] = sl_price
+
     result = mt5.order_send(request)
     mt5.shutdown()
 
@@ -56,5 +78,9 @@ def place_trade(symbol, trade_type, price, volume=0.01):
         print(f"❌ Error al ejecutar trade: {result.retcode}")
         return False
 
-    print(f"💹 Trade ejecutado en MT5: {trade_type} {symbol} @ {price}")
+    print(f"💹 Trade ejecutado en MT5: {trade_type} {symbol} @ {price} | Volumen: {volume}")
+    if take_profit:
+        print(f"   ✅ TP: {tp_price}")
+    if stop_loss:
+        print(f"   ❌ SL: {sl_price}")
     return True

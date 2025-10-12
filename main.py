@@ -1,30 +1,48 @@
 # main.py
-from trading_interface import get_historical_data, calculate_indicators, place_trade, MT5_AVAILABLE
+import time
+from trading_interface import TradingInterface, MT5_AVAILABLE
 
-def main():
-    # Obtener datos históricos (simulados o MT5 real)
-    data = get_historical_data()
+# ===========================
+# 🔹 Configuración inicial
+# ===========================
+MODE = "real"  # "sim" o "real"
+SYMBOL = "EURUSD"
+CAPITAL = 1000
+RISK_PER_TRADE = 0.01
+TIMEFRAME_MIN = 1
+LOOP_INTERVAL = TIMEFRAME_MIN * 60
 
-    # Calcular indicadores (EMA50, EMA200, RSI14)
-    data = calculate_indicators(data)
+# Inicializar trader
+trader = TradingInterface(mode=MODE, symbol=SYMBOL, capital=CAPITAL, risk_per_trade=RISK_PER_TRADE)
 
-    # Tomar la última fila para la decisión de trading
-    last_row = data.iloc[-1]
-    price = last_row["Close"]
-    ema50 = last_row["EMA50"]
-    ema200 = last_row["EMA200"]
-    rsi14 = last_row["RSI14"]
+print(f"💻 Modo: {'MT5' if MODE == 'real' and MT5_AVAILABLE else 'SIMULADOR'}")
+print(f"🕒 Comenzando trading automático: {SYMBOL} | Intervalo: {TIMEFRAME_MIN} min\n")
 
-    # Mostrar estado y valores
-    print(f"Modo: {'MT5' if MT5_AVAILABLE else 'SIMULADOR'}")
-    print(f"Precio actual: {price}")
-    print(f"EMA50: {ema50}, EMA200: {ema200}, RSI14: {rsi14}")
+# ===========================
+# 🔹 Loop principal de trading
+# ===========================
+try:
+    while True:
+        # 1️⃣ Obtener datos
+        data = trader.get_prices()
 
-    # Estrategia simple: EMA50 cruza EMA200
-    trade_type = "COMPRA" if ema50 > ema200 else "VENTA"
-    place_trade("BTCUSDT", trade_type, price)
+        # 2️⃣ Calcular indicadores
+        data = trader.calculate_indicators(data)
 
-    print(f"✅ Trade guardado: BTCUSDT - {trade_type} @ {price}")
+        # 3️⃣ Generar señal
+        signal = trader.generate_signal(data)
 
-if __name__ == "__main__":
-    main()
+        # 4️⃣ Ejecutar trade
+        trader.execute_trade(signal)
+
+        # 5️⃣ Guardar en diario
+        trader.log_trade(signal, data)
+
+        # 6️⃣ Esperar siguiente ciclo
+        print(f"⏳ Esperando {TIMEFRAME_MIN} minuto(s)...\n")
+        time.sleep(LOOP_INTERVAL)
+
+except KeyboardInterrupt:
+    print("🛑 Trading detenido manualmente.")
+except Exception as e:
+    print(f"❌ Error inesperado: {e}")
