@@ -3,25 +3,29 @@
 #=========================================]
 
 CONFIG = { 
-          #🔷 Modo de operacion
-          "mode": "sim", # "sim" = simulador | "real" = MetaTrader5
+          #modo: "sim" (simulador), "real" (forzar MT5) o "auto" (intenta conectar MT5)
+          "mode": "auto",          
           
-          #🔷 Parametros base 
+          #parametros de cuenta y riesgo
           "symbol": "EURUSD",
-          "capital": 1000,
-          "risk_per_trade": 0.01,  #1%
-          "take_profit": 0.01,     #1%
-          "stop_loss": 0.01,       #1%
-          "loop_interval": 10,     #segundos entre cada ciclo
+          "capital": 1000.0,
+          "risk_per_trade": 0.01, #1%
+          "take_profit": 0.01,    #1%
+          "stop_loss": 0.01,      #1%
+                    
+          #Loop / timing
+          "interval_type": "seconds", #"secunds", "minutes", "hours"
+          "interval_value": 10, #valor base
           
-
-          #🔷 Archivos de datos y logs 
+          #archivos 
           "data_path": "data/precios.csv",
-          "signal_log": "data/signals_log.csv",
-          "trade_log": "trades_log.csv",
-          
+          "signals_log": "data/signal_log.csv",
+          "trades_log": "data/trades_log.csv",
+                    
           #🔷Configuracion MT5 (solo si mode == "real")
-          "mt5_login": 52533292,
-          "mt5_password": "6&&@@FDUczlA@K",
-          "mt5_server": "ICMarketsInternational-Demo"
+          "mt5":{
+            "login": 52533292,
+            "password": "6&&@@FDUczlA@K",
+            "server": "ICMarketsInternational-Demo"    
+          }         
 }
