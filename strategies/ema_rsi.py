@@ -1,41 +1,60 @@
+# utils/utils_mt5.py
 import pandas as pd
-import numpy as np
+try:
+    import MetaTrader5 as mt5
+except Exception as e:
+    raise ImportError("MetaTrader5 no disponible en este entorno.") from e
 
-# ============================
-# 📊 Estrategia EMA50/EMA200 + RSI14
-# ============================
+def get_historical_data(symbol="EURUSD", timeframe=mt5.TIMEFRAME_M1, bars=500):
+    if not mt5.initialize():
+        return pd.DataFrame()
+    rates = mt5.copy_rates_from_pos(symbol, timeframe, 0, bars)
+    mt5.shutdown()
+    if rates is None:
+        return pd.DataFrame()
+    df = pd.DataFrame(rates)
+    # convertir nombres a capitalizados para compatibilidad
+    df = df.rename(columns={"time": "Datetime", "open": "Open", "high": "High", "low": "Low", "close": "Close", "tick_volume": "Volume"})
+    df["Datetime"] = pd.to_datetime(df["Datetime"], unit="s")
+    return df
 
-def calculate_indicators(data: pd.DataFrame) -> pd.DataFrame:
-    """
-    Calcula los indicadores técnicos (EMA y RSI).
-    """
-    data["EMA50"] = data["close"].ewm(span=50, adjust=False).mean()
-    data["EMA200"] = data["close"].ewm(span=200, adjust=False).mean()
+def place_trade(symbol, trade_type, price, volume=0.01, take_profit=None, stop_loss=None):
+    if not mt5.initialize():
+        print("❌ No se pudo inicializar MT5")
+        return False
 
-    # RSI
-    delta = data["close"].diff()
-    gain = delta.clip(lower=0)
-    loss = -delta.clip(upper=0)
-    avg_gain = gain.rolling(window=14).mean()
-    avg_loss = loss.rolling(window=14).mean()
-    rs = avg_gain / avg_loss
-    data["RSI"] = 100 - (100 / (1 + rs))
-
-    return data.dropna()
-
-
-def generate_signal(data: pd.DataFrame) -> dict:
-    """
-    Genera señal BUY / SELL / HOLD según cruces EMA y RSI.
-    """
-    if len(data) < 200:
-        return {"type": "HOLD", "reason": "Datos insuficientes"}
-
-    last = data.iloc[-1]
-
-    if last["EMA50"] > last["EMA200"] and last["RSI"] > 55:
-        return {"type": "BUY", "price": last["close"], "reason": "Tendencia alcista confirmada"}
-    elif last["EMA50"] < last["EMA200"] and last["RSI"] < 45:
-        return {"type": "SELL", "price": last["close"], "reason": "Tendencia bajista confirmada"}
+    if trade_type.upper() in ["BUY", "COMPRA"]:
+        order_type = mt5.ORDER_TYPE_BUY
+        tp = price * (1 + take_profit) if take_profit else None
+        sl = price * (1 - stop_loss) if stop_loss else None
     else:
-        return {"type": "HOLD", "price": last["close"], "reason": "Sin confirmación"}
+        order_type = mt5.ORDER_TYPE_SELL
+        tp = price * (1 - take_profit) if take_profit else None
+        sl = price * (1 + stop_loss) if stop_loss else None
+
+    req = {
+        "action": mt5.TRADE_ACTION_DEAL,
+        "symbol": symbol,
+        "volume": volume,
+        "type": order_type,
+        "price": price,
+        "deviation": 10,
+        "magic": 123456,
+        "comment": "ARGOTH",
+        "type_time": mt5.ORDER_TIME_GTC,
+        "type_filling": mt5.ORDER_FILLING_IOC,
+    }
+    if tp:
+        req["tp"] = tp
+    if sl:
+        req["sl"] = sl
+
+    res = mt5.order_send(req)
+    mt5.shutdown()
+    if res.retcode != mt5.TRADE_RETCODE_DONE:
+        print(f"❌ Error MT5 retcode: {res.retcode}")
+        return False
+    print(f"💹 Trade enviado a MT5: {trade_type} {symbol} @ {price} (vol {volume})")
+    return True
+
+ 
