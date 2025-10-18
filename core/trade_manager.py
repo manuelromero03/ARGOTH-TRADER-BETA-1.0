@@ -5,6 +5,7 @@ from config import CONFIG
 from core.strategy_engine import StrategyEngine
 from core.risk_manager import RiskManager
 from utils.helpers import safe_print
+from utils.utils_sim import get_historical_data, place_trade
 
 # Intenta detectar MetaTrader5 si mode="auto"
 def _detect_mt5_and_set_mode(cfg):

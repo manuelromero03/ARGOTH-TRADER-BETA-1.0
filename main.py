@@ -4,6 +4,14 @@ import platform
 from core.trade_manager import TradeManager
 from config import CONFIG
 
+# Intentar importar MetaTrader5 (solo si está disponible)
+try:
+    import MetaTrader5 as mt5
+    MT5_AVAILABLE = True
+except ImportError:
+    MT5_AVAILABLE = False
+    print("⚠️ MetaTrader5 no disponible. ARGOTH usará modo SIMULADOR.\n")
+
 def main():
     print(f"\nARGOTH v3.0 — ARRANCANDO (OS: {platform.system()})\n")
     manager = TradeManager(CONFIG)
