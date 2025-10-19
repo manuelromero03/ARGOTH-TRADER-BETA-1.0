@@ -42,7 +42,7 @@ def main():
                     else:
                         sleep_t = 60
                     print(f"⏳ Esperando {v} {interval_type}...\n")
-                    time.sleep(sleep_t)
+                    time.sleep(manager.delay)
 
             elif cmd == "pause":
                 paused = True
@@ -55,6 +55,13 @@ def main():
             elif cmd == "stop":
                 running = False
                 print("🛑 Detenido por usuario.\n")
+            elif cmd.startswith("setdelay"):
+                try:
+                    _, value = cmd.split()
+                    manager.delay = int(value)
+                    print(f"🧭 Intervalo actualizado a {manager.delay} segundos.")
+                except Exception:
+                    print("⚠ Uso correcto: setdelay <segundos>/n")
             else:
                 print("Comando no reconocido. Usa: run, pause, resume, status, stop\n")
 

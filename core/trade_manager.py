@@ -3,6 +3,7 @@ import pandas as pd
 import importlib
 from config import CONFIG
 from core.strategy_engine import StrategyEngine
+from core.visual_engine import visualEngine
 from core.risk_manager import RiskManager
 from utils.helpers import safe_print
 from utils.utils_sim import get_historical_data, place_trade
@@ -28,6 +29,8 @@ class TradeManager:
         self.symbol = self.cfg["symbol"]
         self.strategy = StrategyEngine(self.cfg)
         self.risk = RiskManager(self.cfg)
+        self.visual = visualEngine()
+        self.delay = 10 #🧭 Intervalo en 10 por defecto 
         # utils modules
         if self.mode == "real":
             try:
@@ -57,6 +60,9 @@ class TradeManager:
 
         # 2) calcular indicadores
         data = self.strategy.calculate_indicators(data)
+
+        self.visual.update_data(data)
+        self.visual.render()
 
         # 3) generar señal (dict or None)
         signal = self.strategy.generate_signal(data)
