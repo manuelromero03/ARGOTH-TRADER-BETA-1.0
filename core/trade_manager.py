@@ -1,6 +1,6 @@
-# core/trade_manager.py
 import pandas as pd
 import importlib
+import os
 from config import CONFIG
 from core.strategy_engine import StrategyEngine
 from core.visual_engine import visualEngine
@@ -22,6 +22,7 @@ def _detect_mt5_and_set_mode(cfg):
     except Exception:
         return "sim"
 
+
 class TradeManager:
     def __init__(self, cfg=None):
         self.cfg = cfg or CONFIG
@@ -30,7 +31,8 @@ class TradeManager:
         self.strategy = StrategyEngine(self.cfg)
         self.risk = RiskManager(self.cfg)
         self.visual = visualEngine()
-        self.delay = 10 #🧭 Intervalo en 10 por defecto 
+        self.delay = 10  # 🧭 Intervalo en 10 por defecto
+
         # utils modules
         if self.mode == "real":
             try:
@@ -39,42 +41,42 @@ class TradeManager:
                 from utils import utils_sim as broker
         else:
             from utils import utils_sim as broker
+
         self.broker = broker
         safe_print(f"🚀 TradeManager iniciado en modo [{self.mode.upper()}] para {self.symbol}")
 
     def run_cycle(self):
+        # crear carpeta logs si no existe
+        os.makedirs("logs", exist_ok=True)
         safe_print("🔁 Iniciando ciclo...")
+
         # 1) obtener datos
         data = self.broker.get_historical_data(self.symbol)
         if data is None or len(data) == 0:
             safe_print("⚠️ No hay datos. Saltando ciclo.")
             return
 
-        # ensure column names compatible (Datetime index + Open/High/Low/Close/Volume)
+        # 2) formatear columnas
         if "Datetime" not in data.columns and data.index.name != "Datetime":
-            # try rename time->Datetime or time->index -> Datetime
             if "time" in data.columns:
                 data = data.rename(columns={"time": "Datetime"})
                 data["Datetime"] = pd.to_datetime(data["Datetime"])
                 data.set_index("Datetime", inplace=True)
 
-        # 2) calcular indicadores
+        # 3) calcular indicadores
         data = self.strategy.calculate_indicators(data)
-
         self.visual.update_data(data)
         self.visual.render()
 
-        # 3) generar señal (dict or None)
+        # 4) generar señal
         signal = self.strategy.generate_signal(data)
 
-        # 4) calcular lote
-        lot = None
+        # 5) calcular lote si hay señal
         if signal:
             lot = self.risk.calculate_lot_size(price=signal["price"])
             signal["lot"] = lot
 
-        # 5) ejecutar trade
-        if signal:
+            # ejecutar trade
             self.broker.place_trade(
                 self.symbol,
                 signal["type"],
@@ -84,16 +86,20 @@ class TradeManager:
                 stop_loss=self.cfg["stop_loss"],
             )
 
-        # 6) log (strategy can also log)
-        self.strategy.log_signal(signal, data)
+            # registrar señal
+            self.strategy.log_signal(signal, data)
+        else:
+            # registrar ciclo sin señal
+            with open("logs/no_signal.log", "a") as f:
+                f.write(f"{pd.Timestamp.now()} | Símbolo: {self.symbol} | No hay señal\n")
 
         safe_print("✅ Ciclo completado.")
 
     def shutdown(self):
-        # broker-specific shutdown
         try:
             if self.mode == "real":
                 import MetaTrader5 as mt5
                 mt5.shutdown()
         except Exception:
             pass
+    safe_print("🛑 TradeManager detenido.")

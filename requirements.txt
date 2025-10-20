@@ -1,6 +1,7 @@
+# === Core ARGOTH Dependencies ===
 aiodns==3.5.0
 aiohappyeyeballs==2.6.1
-aiohttp==3.12.15
+aiohttp==3.8.6
 aiosignal==1.4.0
 anyio==4.9.0
 argon2-cffi==25.1.0
@@ -10,11 +11,11 @@ asttokens==3.0.0
 async-lru==2.0.5
 attrs==25.3.0
 babel==2.17.0
-beautifulsoup4==4.13.4
+beautifulsoup4==4.13.0
 bleach==6.2.0
 ccxt==4.5.7
 certifi==2025.7.9
-cffi==2.0.0
+cffi==1.17.1
 charset-normalizer==3.4.2
 colorama==0.4.6
 comm==0.2.2
@@ -22,7 +23,7 @@ contourpy==1.3.2
 cryptography==46.0.2
 curl_cffi==0.13.0
 cycler==0.12.1
-debugpy==1.8.14
+debugpy==1.8.15
 decorator==5.2.1
 defusedxml==0.7.1
 executing==2.2.0
@@ -38,9 +39,9 @@ GitPython==3.1.44
 h11==0.16.0
 httpcore==1.0.9
 httpx==0.28.1
-idna==3.10
-ipykernel==6.29.5
-ipython==9.4.0
+idna==3.4
+ipykernel==6.30.1
+ipython==9.6.2
 ipython_pygments_lexers==1.1.1
 isoduration==20.11.0
 jedi==0.19.2
@@ -77,10 +78,10 @@ nbformat==5.10.4
 nest-asyncio==1.6.0
 networkx==3.3
 notebook_shim==0.2.4
-numpy==2.3.1
+numpy==1.26.4
 overrides==7.7.0
 packaging==25.0
-pandas==2.3.1
+pandas-ta>=0.4.71b0
 pandocfilters==1.5.1
 parso==0.8.4
 peewee==3.18.2
@@ -91,8 +92,8 @@ plotly==6.2.0
 prometheus_client==0.22.1
 prompt_toolkit==3.0.51
 propcache==0.4.0
-protobuf==6.32.1
-psutil==7.0.0
+protobuf==4.24.0
+psutil==5.9.9
 ptyprocess==0.7.0
 pure_eval==0.2.3
 pycares==4.11.0
@@ -109,8 +110,8 @@ requests==2.32.4
 rfc3339-validator==0.1.4
 rfc3986-validator==0.1.1
 rpds-py==0.26.0
-scikit-learn==1.7.0
-scipy==1.16.0
+scikit-learn==1.2.2
+scipy==1.11.2
 seaborn==0.13.2
 Send2Trash==1.8.3
 setuptools==80.9.0
@@ -138,3 +139,18 @@ websocket-client==1.8.0
 websockets==15.0.1
 yarl==1.21.0
 yfinance==0.2.66
+
+# === Dev / Testing / Linting ===
+pytest>=8.3.0
+pytest-cov>=4.1.0
+tox>=4.9.1
+black>=24.10.0
+flake8>=6.1.0
+isort>=6.12.0
+mypy>=1.4.1
+pre-commit>=3.4.0
+python-dotenv>=1.0.1
+ipdb>=0.14.17
+rich>=13.7.0
+memory-profiler>=0.6.2
+line-profiler>=4.2.0
