@@ -8,7 +8,7 @@ LOG_PATH = Path("logs/auto_commit.log")
 
 def log_event(message):
     LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
-    with open(LOG_PATH, "a") as f:
+    with open(LOG_PATH, "a", encoding="utf-8") as f:
         f.write(f"[{datetime.datetime.now()}] {message}\n")
 
 def auto_commit():
