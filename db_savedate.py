@@ -1,8 +1,10 @@
 import csv
 import os
+import sqlite3
 from datetime import datetime
 from pathlib import Path
 
+# Directorios base para datos y logs
 DATA_DIR = Path("data")
 LOG_DIR = Path("logs")
 
@@ -68,3 +70,72 @@ def save_last_commit():
         save_system_event("PULSE", "🧩 ARGOTH actualizado correctamente (commit exitoso).")
     except Exception as e:
         save_system_event("ERROR", f"No se pudo guardar last_commit.json: {e}")
+
+# --- Sistema de "Pulso de vida" (ultimo commit registrado) ---
+
+DB_PATH = Path("data") / "argoth_system.db"
+
+def save_last_commit_timestamp():
+    """Guarda en la base de datos la fecha, hora y rama de ultimo commit exitoso."""
+    from subprocess import run 
+
+    #Asegura existencia de la base de datos y la tabla 
+    conn = sqlite3.connect(DB_PATH)
+    cursor =  conn.cursor()
+    cursor.executer("""
+    CREATE TABLE IF NOT EXISTS system_status (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    event TEXT, 
+                    branch TEXT,
+                    timestamp TEXT
+                )
+                    """)
+            
+    #Obtiene la rama actual de git
+    try: 
+        result = run(["git", "branch", "--show-current"], capture_output=True, text=True)
+        branch = result.stdout.strip() or "unknown"
+    except Exception:
+        branch = "unknown"
+
+    #Inserta el registro 
+    cursor.execute("""
+        INSERT INTO system_status (event, branch, timestamp)
+        VALUES (?, ?, ?)
+        """, ("Last Succesfull Commit", branch, _timestamp()))
+    conn.commit()
+    conn.close()
+    
+    #También lo deja reflejado en los logs del sistema 
+    save_system_event("PULSE", f"🧩Commit existoso registrado en rama {'branch'}.")
+
+def get_last_commit_status():
+    """Verifica el ultimo commit existoso devuelve en resume del estado."""
+    file_path = DATA_DIR /  "last_commit.json"
+    if not file_path.exists():
+        return "⚠ No se ha registrado ningun commit exitoso aun."
+    
+    try:
+        with file_path.open("r", encoding="utf-8") as f:
+            data = f.read().strip() 
+        timestamp = data.split('"')[3] #Extrae la fecha del JSON simple 
+        commit_time = datetime.strip.time(timestamp, "%Y-%m-%d %H:%M:%S")
+        delta = datetime.now() - commit_time 
+
+        minutos = int(delta.total_seconds() // 60)
+        if minutos < 1: 
+            return f"Utltimo commit exitoso hace unos segundos. ({timestamp}) - ARTGOTH sincronizado."
+        elif minutos < 60: 
+            return f"Ultimo commit exitoso hace {minutos} min - sistema estable."
+        else: 
+            horas = minutos // 60 
+            return f"⚠ Ultimo commit hace {horas} h - posible inactividad detectada."
+        
+    except Exception as e:
+        save_system_event("ERROR", f"No se pudo leer last_commit.json: {e}")
+        return "❌ Error al leer el estado del ultimo commit."
+
+
+
+
+    
