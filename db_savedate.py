@@ -1,72 +1,70 @@
 import csv
 import os
 from datetime import datetime
+from pathlib import Path
 
-DATA_DIR = "data"
+DATA_DIR = Path("data")
+LOG_DIR = Path("logs")
 
-# Asegura que exista el directorio
-os.makedirs(DATA_DIR, exist_ok=True)
+# Asegura directorios base
+DATA_DIR.mkdir(parents=True, exist_ok=True)
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+
+def _timestamp():
+    """Devuelve el timestamp estándar del sistema ARGOTH."""
+    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+def _write_csv(file_path, headers, data_row):
+    """Manejo unificado de escritura en CSV con manejo de errores."""
+    try:
+        exists = file_path.exists()
+        with file_path.open(mode="a", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            if not exists:
+                writer.writerow(headers)
+            writer.writerow(data_row)
+    except Exception as e:
+        save_system_event("ERROR", f"Falló escritura en {file_path.name}: {e}")
 
 def save_trade(symbol, action, price, volume, profit=0.0, comment=""):
     """Guarda los trades ejecutados (manuales o automáticos)."""
-    file_path = os.path.join(DATA_DIR, "trades_log.csv")
-    exists = os.path.exists(file_path)
-
-    with open(file_path, mode="a", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        if not exists:
-            writer.writerow(["timestamp", "symbol", "action", "price", "volume", "profit", "comment"])
-
-        writer.writerow([
-            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            symbol,
-            action,
-            price,
-            volume,
-            profit,
-            comment
-        ])
+    file_path = DATA_DIR / "trades_log.csv"
+    _write_csv(file_path, 
+        ["timestamp", "symbol", "action", "price", "volume", "profit", "comment"],
+        [_timestamp(), symbol, action, price, volume, profit, comment]
+    )
 
 def save_signal(symbol, signal_type, ema_fast, ema_slow, rsi, comment=""):
     """Guarda las señales generadas por las estrategias."""
-    file_path = os.path.join(DATA_DIR, "signals_log.csv")
-    exists = os.path.exists(file_path)
-
-    with open(file_path, mode="a", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        if not exists:
-            writer.writerow(["timestamp", "symbol", "signal", "ema_fast", "ema_slow", "rsi", "comment"])
-
-        writer.writerow([
-            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            symbol,
-            signal_type,
-            ema_fast,
-            ema_slow,
-            rsi,
-            comment
-        ])
+    file_path = DATA_DIR / "signals_log.csv"
+    _write_csv(file_path,
+        ["timestamp", "symbol", "signal", "ema_fast", "ema_slow", "rsi", "comment"],
+        [_timestamp(), symbol, signal_type, ema_fast, ema_slow, rsi, comment]
+    )
 
 def save_price(symbol, price):
     """Guarda los precios monitoreados."""
-    file_path = os.path.join(DATA_DIR, "precios.csv")
-    exists = os.path.exists(file_path)
-
-    with open(file_path, mode="a", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        if not exists:
-            writer.writerow(["timestamp", "symbol", "price"])
-
-        writer.writerow([
-            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            symbol,
-            price
-        ])
+    file_path = DATA_DIR / "precios.csv"
+    _write_csv(file_path,
+        ["timestamp", "symbol", "price"],
+        [_timestamp(), symbol, price]
+    )
 
 def save_system_event(event_type, detail):
-    """Guarda eventos del sistema ARGOTH (errores, pausas, etc.)."""
-    file_path = os.path.join("logs", "system_events.log")
-    os.makedirs("logs", exist_ok=True)
+    """Registra eventos del sistema ARGOTH (errores, pausas, commits, etc.)."""
+    file_path = LOG_DIR / "system_events.log"
+    try:
+        with file_path.open(mode="a", encoding="utf-8") as f:
+            f.write(f"[{_timestamp()}] {event_type}: {detail}\n")
+    except Exception as e:
+        print(f"[CRITICAL] Error registrando evento del sistema: {e}")
 
-    with open(file_path, mode="a", encoding="utf-8") as f:
-        f.write(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] {event_type}: {detail}\n")
+def save_last_commit():
+    """Registra la fecha del último commit exitoso."""
+    file_path = DATA_DIR / "last_commit.json"
+    try:
+        with file_path.open("w", encoding="utf-8") as f:
+            f.write(f'{{"last_commit": "{_timestamp()}"}}')
+        save_system_event("PULSE", "🧩 ARGOTH actualizado correctamente (commit exitoso).")
+    except Exception as e:
+        save_system_event("ERROR", f"No se pudo guardar last_commit.json: {e}")
