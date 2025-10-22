@@ -82,7 +82,7 @@ def save_last_commit_timestamp():
     #Asegura existencia de la base de datos y la tabla 
     conn = sqlite3.connect(DB_PATH)
     cursor =  conn.cursor()
-    cursor.executer("""
+    cursor.execute("""
     CREATE TABLE IF NOT EXISTS system_status (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     event TEXT, 

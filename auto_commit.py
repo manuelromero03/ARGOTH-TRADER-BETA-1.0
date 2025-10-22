@@ -32,7 +32,7 @@ def auto_commit():
         # Subir cambios
         subprocess.run(["git", "push", "origin", "main"], check=True)
         # Registrar en logs y mostrar pulso del sistema 
-        save_last_commit_timestamp() #Registrar la fecha del ultimo commit
+        save_last_commit_timestamp() # Registrar la fecha del ultimo commit
         status_message = get_last_commit_status() 
         log_event(f"✅ {commit_message} enviado correctamente. {status_message}")
         print("✅ Auto commit completado y enviado a GitHub./n{status_message}")
