@@ -3,6 +3,8 @@ import platform
 import threading
 from core.trade_manager import TradeManager
 from config import CONFIG
+from db_savedate import save_last_commit
+from auto_commit import auto_commit, manual_commit
 
 try:
     import MetaTrader5 as mt5
@@ -97,7 +99,14 @@ def main():
                         print("❌ Fallo al enviar trade manual.\n")
                 except Exception as e:
                     print(f"⚠ Error al procesar trade manual: {e}\n")
-
+            elif cmd.startswith("commit"):
+                try:
+                    message = cmd.split(" ", 1)[1] if " " in cmd else "Manual commit desde ARGOTH"
+                    manual_commit(message)
+                    save_last_commit()
+                    print(f"🧩 Commit manual completado: {message}/n")
+                except Exception as e:
+                    print(f"❌ Error al hacer commit manual: {e}\n")
             else:
                 print("Comando no reconocido. Usa: run, pause, resume, status, stop, setdelay, trade\n")
 
@@ -108,6 +117,13 @@ def main():
         manager.shutdown()
         print("🔚 ARGOTH cerrado correctamente.")
 
-
+        # === Registro de commit y pulso de vida ===
+        try: 
+            print("💾 Guardado commit y registro de actividad...")
+            auto_commit()
+            save_last_commit()
+            print("✅ Cambios guardados y enviados a GitHub correctamente.\n")
+        except Exception as e:
+            print(f"❌ Error al guardar commit automático: {e}\n")
 if __name__ == "__main__":
     main()
