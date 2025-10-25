@@ -7,6 +7,7 @@ from core.visual_engine import visualEngine
 from core.risk_manager import RiskManager
 from utils.helpers import safe_print
 from utils.utils_sim import get_historical_data, place_trade
+import random #señales temporales para testing
 
 # Intenta detectar MetaTrader5 si mode="auto"
 def _detect_mt5_and_set_mode(cfg):
@@ -73,7 +74,10 @@ class TradeManager:
 
         # 5) calcular lote si hay señal
         if signal:
-            lot = self.risk.calculate_lot_size(price=signal["price"])
+            stop_loss_pips = self.cfg.get("stop_loss_pips", 50)
+            pip_value = self.cfg.get("pip_value", 10)
+            price = signal["price"]
+            lot = self.risk.calculate_lot_size(price, stop_loss_pips, pip_value)
             signal["lot"] = lot
 
             # ejecutar trade
@@ -85,6 +89,10 @@ class TradeManager:
                 take_profit=self.cfg["take_profit"],
                 stop_loss=self.cfg["stop_loss"],
             )
+            #Simular resultado (en el futuro se conectara con trade real o backtest)
+            simulated_pnl = random.uniform(-50, 100) #ejemplo: ganancia/perdida simulada
+            self.risk.update_capital(simulated_pnl)
+            safe_print(f"💰 Resultado trade: {simulated_pnl:+.2f} | Capital actualizado: {self.risk.capital:.2f}")
 
             # registrar señal
             self.strategy.log_signal(signal, data)
@@ -102,4 +110,4 @@ class TradeManager:
                 mt5.shutdown()
         except Exception:
             pass
-    safe_print("🛑 TradeManager detenido.")
+        safe_print("🛑 TradeManager detenido.")

@@ -12,7 +12,15 @@ CONFIG = {
           "risk_per_trade": 0.01, #1%
           "take_profit": 0.01,    #1%
           "stop_loss": 0.01,      #1%
-                    
+
+          #🧩Parametros avanzados de riesgo (para RiskManager pro)
+          "stop_loss_pips": 50,   #tamaño promedio del stop loss en pips
+          "pip_value": 10,        #valor por pip en USD (aprox. para 1 lote en forex mayor)
+          "min_lot": 0.01,        #tamaño minimo permitido por el broker
+          "max_lot": 10.0,        #tamaño maximo permitido por el broker
+          "max_daily_loss": 0.05, #5% del capital maximo diario
+          "max_drawdown": 0.2,    #20% de perdida maxima total    
+
           #Loop / timing
           "interval_type": "seconds", #"secunds", "minutes", "hours"
           "interval_value": 10, #valor base
