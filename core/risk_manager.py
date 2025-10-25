@@ -232,6 +232,22 @@ class RiskManager:
         self._save_metrics_db()
         return metrics
 
+    def log_risk_info(self, symbol: str, price: float, lot: float):
+        """
+        Guarda en logs/system_events.log información completa del riesgo y lote calculado.
+        """
+        msg = (
+            f"{pd.Timestamp.now()} | {symbol} | Price: {price} | "
+            f"Calculated lot: {lot} | Capital disponible: {self.capital:.2f} | "
+            f"Riesgo por trade: {self.risk_per_trade*100:.2f}%\n"
+        )
+        # escribir en archivo
+        os.makedirs("logs", exist_ok=True)
+        with open("logs/system_events.log", "a") as f:
+            f.write(msg)
+        # imprimir en consola
+        print(f"[RiskManager] {msg.strip()}")
+
     def reset_capital(self):
         """Reinicia capital al valor inicial (para testing)."""
         self.capital = float(self.initial_capital)

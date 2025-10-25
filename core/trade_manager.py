@@ -66,46 +66,49 @@ class TradeManager:
         os.makedirs("logs", exist_ok=True)
         safe_print("🔁 Iniciando ciclo...")
 
-        # 1) obtener datos
+        # 1) Obtener datos históricos
         data = self.broker.get_historical_data(self.symbol)
         if data is None or len(data) == 0:
             safe_print("⚠️ No hay datos. Saltando ciclo.")
             return
 
-        # 2) formatear columnas
+        # 2) Formatear columnas si es necesario
         if "Datetime" not in data.columns and data.index.name != "Datetime":
             if "time" in data.columns:
                 data = data.rename(columns={"time": "Datetime"})
                 data["Datetime"] = pd.to_datetime(data["Datetime"])
                 data.set_index("Datetime", inplace=True)
 
-        # 3) calcular indicadores
+        # 3) Calcular indicadores y actualizar visualización
         data = self.strategy.calculate_indicators(data)
         self.visual.update_data(data)
         self.visual.render()
 
-        # 4) generar señal
+        # 4) Generar señal según estrategia
         signal = self.strategy.generate_signal(data)
 
-        # 5) calcular lote si hay señal
-        if signal:
-            stop_loss_pips = self.cfg.get("stop_loss_pips", 50)
-            pip_value = self.cfg.get("pip_value", 10)
-            price = signal["price"]
+        # ===== 5) Calcular lote y registrar métricas de riesgo siempre =====
+        stop_loss_pips = self.cfg.get("stop_loss_pips", 50)
+        pip_value = self.cfg.get("pip_value", 10)
+        last_price = data["close"].iloc[-1]  # último precio disponible
 
-            # === 🧠 Nueva lógica de riesgo === #
-            lot = self.risk.calculate_lot_size(
-                price=price,
-                stop_loss_pips=stop_loss_pips,
-                pip_value=pip_value,
-                instrument_type="forex"
-            )
+        # calcular lote basado en riesgo
+        lot = self.risk.calculate_lot_size(
+            price=last_price,
+            stop_loss_pips=stop_loss_pips,
+            pip_value=pip_value,
+            instrument_type="forex"
+        )
+
+        # registrar métricas y lote en logs
+        self.risk.log_metrics()            # métricas generales de riesgo
+        self.risk.log_risk_info(self.symbol, last_price, lot)  # detalle del lote
+
+        # ===== 6) Si hay señal, ejecutar trade =====
+        if signal:
             signal["lot"] = lot
 
-            # registrar info riesgo en logs
-            self.risk.log_risk_info(self.symbol, price, lot)
-
-            # === Control de exposición === #
+            # verificar exposición
             if not self.risk.can_trade():
                 self.risk._log("❌ Operación bloqueada por riesgo. Exposición demasiado alta.")
                 with open("logs/system_events.log", "a") as f:
@@ -122,7 +125,7 @@ class TradeManager:
                 stop_loss=self.cfg["stop_loss"],
             )
 
-            # simular resultado (en el futuro conectar con trade real o backtest)
+            # simular resultado (para testing/backtest)
             simulated_pnl = random.uniform(-50, 100)
             self.risk.update_capital(simulated_pnl)
 
@@ -143,6 +146,7 @@ class TradeManager:
             # registrar ciclo sin señal
             with open("logs/no_signal.log", "a") as f:
                 f.write(f"{pd.Timestamp.now()} | Símbolo: {self.symbol} | No hay señal\n")
+            safe_print(f"ℹ️ No hay señal, pero métricas de riesgo calculadas.")
 
         safe_print("✅ Ciclo completado.")
 
