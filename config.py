@@ -4,7 +4,7 @@
 
 CONFIG = { 
           #modo: "sim" (simulador), "real" (forzar MT5) o "auto" (intenta conectar MT5)
-          "mode": "auto",          
+          "mode": "sim",          
           
           #parametros de cuenta y riesgo
           "symbol": "EURUSD",
