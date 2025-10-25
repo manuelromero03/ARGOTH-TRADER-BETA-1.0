@@ -77,8 +77,23 @@ class TradeManager:
             stop_loss_pips = self.cfg.get("stop_loss_pips", 50)
             pip_value = self.cfg.get("pip_value", 10)
             price = signal["price"]
-            lot = self.risk.calculate_lot_size(price, stop_loss_pips, pip_value)
+
+            #=== 🧠 NUEVA LOGICA  DE RIESGO ===#
+            lot = self.risk.calculate_lot_size(
+                price=price,
+                stop_loss_pips=stop_loss_pips,
+                pip_value=pip_value,
+                instrument_type="forex"
+            )
             signal["lot"] = lot
+            self.risk._log(f"Lote calculado para {self.symbol}: {lot}")
+
+            # === Control de Exposicion ===
+            if not self.risk.can_trade():
+                self.risk._log("❌ Operacion bloqueada por riesgo. Exposicion demasiado alta.")
+                with open("logs/system_events.log", "a") as f:
+                    f.write(f"{pd.Timestamp.now()} | {self.symbol} | Bloqueado por riesgo/n")
+                return 
 
             # ejecutar trade
             self.broker.place_trade(
@@ -92,7 +107,17 @@ class TradeManager:
             #Simular resultado (en el futuro se conectara con trade real o backtest)
             simulated_pnl = random.uniform(-50, 100) #ejemplo: ganancia/perdida simulada
             self.risk.update_capital(simulated_pnl)
-            safe_print(f"💰 Resultado trade: {simulated_pnl:+.2f} | Capital actualizado: {self.risk.capital:.2f}")
+            from db_savedate import save_last_commit
+            from auto_commit import auto_commit
+
+            safe_print(f"Resultado del trade: {simulated_pnl:+.2f} | Capital actualizado: {self.risk.capital:.2f}")
+
+            #Auditoria automatica 🔒 
+            try: 
+                save_last_commit()
+                auto_commit
+            except Exception as e:
+                safe_print(f"⚠ Auditoria fallida: {e}")
 
             # registrar señal
             self.strategy.log_signal(signal, data)
@@ -102,6 +127,12 @@ class TradeManager:
                 f.write(f"{pd.Timestamp.now()} | Símbolo: {self.symbol} | No hay señal\n")
 
         safe_print("✅ Ciclo completado.")
+
+    def show_status(self):
+        """Muestra estado de riesgo y capital actual"""
+        safe_print(f"📊 Capital actual: {self.risk.capital:.2f}")
+        safe_print(f"📈 Riesgo por trade: {self.risk.risk_per_trade*100:.2f}%")
+        safe_print(f"🧩 Modo: {self.mode}") 
 
     def shutdown(self):
         try:
