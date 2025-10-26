@@ -44,6 +44,10 @@ class TradeManager:
         self.broker = broker
         safe_print(f"🚀 TradeManager iniciado en modo [{self.mode.upper()}] para {self.symbol}")
 
+        if self.mode == "real":
+            from utils import utils_mt5
+            utils_mt5.connect_mt5(self.cfg)
+
     # =======================
     # Registro de riesgo
     # =======================

@@ -4,9 +4,19 @@ try:
     import MetaTrader5 as mt5
 except Exception as e:
     raise ImportError("MetaTrader5 no disponible en este entorno.") from e
+from connect_mt5 import connect_mt5
+
+def connec_mt5(cfg):
+    import MetaTrader5 as mt5
+    mt5.shutdowm()
+    if not mt5.initialize(login=cfg["mt5"]["login"], password=cfg["password"], server=cfg["mt5"]["server"]):
+        print("Error: No se pudo conectar a MT5.")
+        return False
+    print(f"✅ Conectado MT5 (servidor verificado) con login ****{str(cfg['mt5']['login'])[-3:]}")
+    return True
 
 def get_historical_data(symbol="EURUSD", timeframe=mt5.TIMEFRAME_M1, bars=500):
-    if not mt5.initialize():
+    if not connect_mt5():
         return pd.DataFrame()
     rates = mt5.copy_rates_from_pos(symbol, timeframe, 0, bars)
     mt5.shutdown()
@@ -19,7 +29,7 @@ def get_historical_data(symbol="EURUSD", timeframe=mt5.TIMEFRAME_M1, bars=500):
     return df
 
 def place_trade(symbol, trade_type, price, volume=0.01, take_profit=None, stop_loss=None):
-    if not mt5.initialize():
+    if not connect_mt5():
         print("❌ No se pudo inicializar MT5")
         return False
 
