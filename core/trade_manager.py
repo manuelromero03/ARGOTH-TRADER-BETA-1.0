@@ -16,38 +16,37 @@ def _detect_mt5_and_set_mode(cfg):
     if mode == "sim":
         return "sim"
     try:
-        import MetaTrader5 as mt5  # noqa
+        import MetaTrader5 as mt5  
         return "real"
     except Exception:
         return "sim"
 
 class TradeManager:
-    def __init__(self, cfg=None):
+    def __init__(self, cfg: dict | None = None):
+        from utils import utils_mt5  # necesario para detectar balance real en MT5
         self.cfg = cfg or CONFIG
-        self.mode = _detect_mt5_and_set_mode(self.cfg)
-        self.symbol = self.cfg["symbol"]
-        self.strategy = StrategyEngine(self.cfg)
-        self.risk_manager = RiskManager(self.cfg)
-        self.risk_manager.show_params()
-        self.visual = visualEngine()
-        self.delay = 10  # 🧭 Intervalo en 10 por defecto
 
-        # Inicializar broker
-        try:
-            if self.mode == "real":
-                from utils import utils_mt5 as broker
-            else:
-                from utils import utils_sim as broker
-        except Exception:
-            from utils import utils_sim as broker
-            safe_print("⚠️ No se pudo cargar MT5, usando simulación")
+        # Detectar capital inicial real si estamos en modo MT5
+        if self.cfg.get("mode") == "real":
+            balance = utils_mt5.get_account_balance()
+            self.initial_capital: float = float(balance) if balance else float(self.cfg.get("capital", 1000.0))
+        else:
+            self.initial_capital: float = float(self.cfg.get("capital", 1000.0))
 
-        self.broker = broker
-        safe_print(f"🚀 TradeManager iniciado en modo [{self.mode.upper()}] para {self.symbol}")
+        # Capital actual
+        self.capital: float = float(self.initial_capital)
+        self.risk_per_trade: float = float(self.cfg.get("risk_per_trade", 0.01))
+        self.min_lot: float = float(self.cfg.get("min_lot", 0.01))
+        self.max_lot: float = float(self.cfg.get("max_lot", 100.0))
 
-        if self.mode == "real":
-            from utils import utils_mt5
-            utils_mt5.connect_mt5(self.cfg)
+        # Límites
+        self.max_daily_loss: float = float(self.cfg.get("max_daily_loss", 0.05))
+        self.max_drawdown: float = float(self.cfg.get("max_drawdown", 0.20))
+
+        # Trackers en runtime
+        self.daily_pnl: float = 0.0
+        self.equity_high: float = self.initial_capital
+        self.logs: list[str] = []
 
     # =======================
     # Registro de riesgo

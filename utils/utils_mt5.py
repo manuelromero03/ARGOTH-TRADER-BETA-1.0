@@ -71,3 +71,14 @@ def place_trade(symbol, trade_type, price, volume=0.01, take_profit=None, stop_l
     print(f"💹 Trade enviado a MT5: {trade_type} {symbol} @ {price} (vol {volume})")
     return True
 
+def get_account_balance():
+    import MetaTrader5 as mt5 
+    if not mt5.initialize():
+        print("❌ No se pudo inicializar MT5")
+        return None
+    account_info = mt5.accout_info()
+    mt5.shutdown()
+    if account_info is None:
+        print("❌ No se pudo obtener info de cuenta")
+        return None 
+    return account_info.balance
