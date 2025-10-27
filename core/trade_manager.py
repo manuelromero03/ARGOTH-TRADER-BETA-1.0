@@ -27,7 +27,8 @@ class TradeManager:
         self.mode = _detect_mt5_and_set_mode(self.cfg)
         self.symbol = self.cfg["symbol"]
         self.strategy = StrategyEngine(self.cfg)
-        self.risk = RiskManager(self.cfg)
+        self.risk_manager = RiskManager(self.cfg)
+        self.risk_manager.show_params()
         self.visual = visualEngine()
         self.delay = 10  # 🧭 Intervalo en 10 por defecto
 

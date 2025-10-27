@@ -6,13 +6,17 @@ except Exception as e:
     raise ImportError("MetaTrader5 no disponible en este entorno.") from e
 from connect_mt5 import connect_mt5
 
-def connec_mt5(cfg):
+def connect_mt5(cfg):
     import MetaTrader5 as mt5
-    mt5.shutdowm()
-    if not mt5.initialize(login=cfg["mt5"]["login"], password=cfg["password"], server=cfg["mt5"]["server"]):
-        print("Error: No se pudo conectar a MT5.")
+    mt5.shutdown()
+    if not mt5.initialize(
+        login=cfg["mt5"]["login"],
+        password=cfg["mt5"]["password"],
+        server=cfg["mt5"]["server"]
+    ):
+        print("❌ Error: No se pudo conectar a MT5.")
         return False
-    print(f"✅ Conectado MT5 (servidor verificado) con login ****{str(cfg['mt5']['login'])[-3:]}")
+    print(f"✅ Conectado a MT5 (servidor verificado) con login ****{str(cfg['mt5']['login'])[-3:]}")
     return True
 
 def get_historical_data(symbol="EURUSD", timeframe=mt5.TIMEFRAME_M1, bars=500):

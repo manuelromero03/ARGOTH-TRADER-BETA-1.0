@@ -42,6 +42,14 @@ class RiskManager:
         # create DB table
         self._init_db()
 
+    def show_params(self):
+        print(f"✅ Capital inicial: {self.initial_capital} USD")
+        print(f"✅ Riesgo por trade: {self.risk_per_trade * 100}%")
+        print(f"✅ StopLoss/TakeProfit: configurados ({self.cfg.get('stop_loss', 0.01)} = 1%)")
+        print(f"✅ Lotes minimos/maximos: {self.max_daily_loss * 100:.0f}%")
+        print(f"✅ Max. perdidas diaria: {self.max_daily_loss * 100:.0f}%")
+        print(f"✅ Max. drawdowm total: {self.max_drawdown * 100:.0f}%")
+
     # ---------- Internal helpers ----------
     def _log(self, msg: str):
         """Registro simple en memoria + stdout para depuración."""
