@@ -13,33 +13,45 @@ import sqlite3
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, Dict
-
+from utils import utils_mt5  # importar utils_mt5 al inicio del archivo
 from config import CONFIG
+import pandas as pd
 
 DATA_DIR = Path("data")
 DB_PATH = DATA_DIR / "argoth_system.db"
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 
-
 class RiskManager:
-    def __init__(self, cfg: dict | None = None):
+    def __init__(self, cfg=None):
         self.cfg = cfg or CONFIG
-        self.initial_capital: float = float(self.cfg.get("capital", 1000.0))
-        self.capital: float = float(self.initial_capital)
-        self.risk_per_trade: float = float(self.cfg.get("risk_per_trade", 0.01))
-        self.min_lot: float = float(self.cfg.get("min_lot", 0.01))
-        self.max_lot: float = float(self.cfg.get("max_lot", 100.0))
+        # ⚡ Detectar capital inicial real si estamos en modo MT5
+        try:
+            if self.cfg.get("mode") == "real":
+                import utils.utils_mt5 as utils_mt5  # asegúrate de importar aquí
+                balance = utils_mt5.get_account_balance()
+                self.initial_capital = float(balance) if balance is not None else float(self.cfg.get("capital", 1000.0))
+            else:
+                self.initial_capital = float(self.cfg.get("capital", 1000.0))
+        except Exception as e:
+            print(f"⚠️ No se pudo detectar capital real: {e}")
+            self.initial_capital = float(self.cfg.get("capital", 1000.0))
 
-        # limits
-        self.max_daily_loss: float = float(self.cfg.get("max_daily_loss", 0.05))  # 5% daily
-        self.max_drawdown: float = float(self.cfg.get("max_drawdown", 0.20))  # 20% from peak
+        # Asignar capital inicial
+        self.capital = float(self.initial_capital)
+        self.risk_per_trade = float(self.cfg.get("risk_per_trade", 0.01))
+        self.min_lot = float(self.cfg.get("min_lot", 0.01))
+        self.max_lot = float(self.cfg.get("max_lot", 100.0))
 
-        # runtime trackers
-        self.daily_pnl: float = 0.0
-        self.equity_high: float = self.initial_capital
-        self.logs: list[str] = []
+        # límites
+        self.max_daily_loss = float(self.cfg.get("max_daily_loss", 0.05))
+        self.max_drawdown = float(self.cfg.get("max_drawdown", 0.20))
 
-        # create DB table
+        # trackers en runtime
+        self.daily_pnl = 0.0
+        self.equity_high = self.initial_capital
+        self.logs = []
+
+        # Inicializar DB si existe
         self._init_db()
 
     def show_params(self):
