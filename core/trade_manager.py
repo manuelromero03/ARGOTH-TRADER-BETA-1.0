@@ -1,13 +1,11 @@
 import pandas as pd
-import importlib
 import os
+import random  # para PnL simulado en testing
 from config import CONFIG
 from core.strategy_engine import StrategyEngine
 from core.visual_engine import visualEngine
 from core.risk_manager import RiskManager
 from utils.helpers import safe_print
-from utils.utils_sim import get_historical_data, place_trade
-import random  # señales temporales para testing
 
 def _detect_mt5_and_set_mode(cfg):
     mode = cfg.get("mode", "auto")
@@ -16,7 +14,7 @@ def _detect_mt5_and_set_mode(cfg):
     if mode == "sim":
         return "sim"
     try:
-        import MetaTrader5 as mt5  
+        import MetaTrader5 as mt5
         return "real"
     except Exception:
         return "sim"
@@ -27,33 +25,33 @@ class TradeManager:
         self.mode = _detect_mt5_and_set_mode(self.cfg)
         self.symbol = self.cfg["symbol"]
         self.strategy = StrategyEngine(self.cfg)
-        
-        # Instanciamos RiskManager
-        self.risk_manager = RiskManager(self.cfg)
-        self.risk_manager.show_params()  # ✅ Muestra capital inicial, riesgo, StopLoss/TakeProfit
 
-        # Visualización y loop
-        self.visual = visualEngine()
-        self.delay = 10  # 🧭 Intervalo por defecto
-
-        # Inicializar broker
+        # ----------------------------
+        # Inicializar broker primero
+        # ----------------------------
         try:
             if self.mode == "real":
                 from utils import utils_mt5 as broker
+                broker.connect_mt5(self.cfg)  # ⚡ conectar antes
             else:
                 from utils import utils_sim as broker
         except Exception:
             from utils import utils_sim as broker
             safe_print("⚠️ No se pudo cargar MT5, usando simulación")
-
         self.broker = broker
 
-        # Conectar MT5 si estamos en modo real
-        if self.mode == "real":
-            from utils import utils_mt5
-            utils_mt5.connect_mt5(self.cfg)
+        # ----------------------------
+        # Instanciar RiskManager
+        # ----------------------------
+        self.risk = RiskManager(self.cfg)
+        self.risk.show_params()  # ✅ muestra capital real/demo y parámetros
+
+        # Visualización y loop
+        self.visual = visualEngine()
+        self.delay = 10  # intervalo por defecto
 
         safe_print(f"🚀 TradeManager iniciado en modo [{self.mode.upper()}] para {self.symbol}")
+        safe_print("📜 Comandos disponibles: run, pause, resume, stop, status, setdelay <seg>, trade BUY/SELL <symbol> <price> <lot>")
 
     # =======================
     # Registro de riesgo
@@ -68,8 +66,6 @@ class TradeManager:
         with open("logs/system_events.log", "a") as f:
             f.write(msg)
         safe_print(f"[RiskManager] {msg.strip()}")
-
-        # Además registra métricas generales en la DB
         self.risk.log_metrics()
 
     # =======================
@@ -100,7 +96,7 @@ class TradeManager:
         # 4) Generar señal según estrategia
         signal = self.strategy.generate_signal(data)
 
-        # ===== 5) Calcular lote y registrar métricas de riesgo siempre =====
+        # 5) Calcular lote y registrar métricas de riesgo siempre
         stop_loss_pips = self.cfg.get("stop_loss_pips", 50)
         pip_value = self.cfg.get("pip_value", 10)
         last_price = data["close"].iloc[-1] if "close" in data.columns else data.iloc[-1, 0]
@@ -112,10 +108,9 @@ class TradeManager:
             instrument_type="forex"
         )
 
-        # registrar métricas de riesgo siempre
         self.record_risk(last_price, lot)
 
-        # ===== 6) Si hay señal, ejecutar trade =====
+        # 6) Ejecutar trade si hay señal
         if signal:
             signal["lot"] = lot
 
@@ -135,17 +130,9 @@ class TradeManager:
                 stop_loss=self.cfg["stop_loss"],
             )
 
+            # PnL simulado
             simulated_pnl = random.uniform(-50, 100)
             self.risk.update_capital(simulated_pnl)
-
-            # Auditoría automática
-            try:
-                from db_savedate import save_last_commit
-                from auto_commit import auto_commit
-                save_last_commit()
-                auto_commit()  # ⚡ corregido
-            except Exception as e:
-                safe_print(f"⚠ Auditoría fallida: {e}")
 
             safe_print(f"💰 Resultado del trade: {simulated_pnl:+.2f} | Capital actualizado: {self.risk.capital:.2f}")
             self.strategy.log_signal(signal, data)
