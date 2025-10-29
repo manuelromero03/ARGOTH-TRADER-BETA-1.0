@@ -58,9 +58,6 @@ class TradeManager:
         # ✅ Mostramos estado inicial (una sola vez)
         safe_print(f"🚀 TradeManager iniciado en modo [{self.mode.upper()}] para {self.symbol}")
         self.risk_manager.show_params()
-        safe_print(
-            "📜 Comandos disponibles: run, pause, resume, stop, status, setdelay <seg>, trade BUY/SELL <symbol> <price> <lot>"
-        )
 
     # =======================
     # Registro de riesgo
