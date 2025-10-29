@@ -168,6 +168,12 @@ class RiskManager:
         self, price: float, stop_loss_pips: Optional[float]=None,
         pip_value: Optional[float]=None, instrument_type: str="forex"
     ) -> float:
+        if not isinstance(price, (int, float)):
+            raise TypeError(f"Price debe ser numero, no {type(price)}: {price}")
+        if price <= 0:
+            raise ValueError(f"Price debe ser mayor a 0, no {price}")
+        if stop_loss_pips <= 0 or pip_value <= 0:
+            raise ValueError("stop_loss_pips y pip_value deben ser mayores a 0")
         if self.capital <= 0 or price <= 0:
             return self.min_lot
         risk_amount = self.capital * self.risk_per_trade

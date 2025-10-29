@@ -1,5 +1,7 @@
+# utils/utils_sim.py
 import pandas as pd
 import numpy as np
+from config import CONFIG
 
 try:
     import MetaTrader5 as mt5
@@ -9,18 +11,17 @@ except ImportError:
     mt5 = None
     MT5_AVAILABLE = False
 
-
-def get_historical_data(symbol="EURUSD", timeframe=None, bars=500):
+def get_historical_data(symbol="EURUSD", timeframe=None, bars=500, cfg=CONFIG):
     """Obtiene datos de MT5 o genera datos simulados si MT5 no está disponible."""
     if MT5_AVAILABLE and timeframe is not None:
         if not mt5.initialize():
             print("❌ No se pudo inicializar MT5. Cambiando a modo simulador.")
-            return simulate_data(bars)
+            return simulate_data(bars, cfg)
         rates = mt5.copy_rates_from_pos(symbol, timeframe, 0, bars)
         mt5.shutdown()
         if rates is None:
             print("⚠️ No se pudieron obtener datos de MT5. Usando datos simulados.")
-            return simulate_data(bars)
+            return simulate_data(bars, cfg)
         df = pd.DataFrame(rates)
         df.rename(columns={
             "time": "Datetime", "open": "Open", "high": "High",
@@ -29,14 +30,14 @@ def get_historical_data(symbol="EURUSD", timeframe=None, bars=500):
         df["Datetime"] = pd.to_datetime(df["Datetime"], unit="s")
         return df
     else:
-        return simulate_data(bars)
+        return simulate_data(bars, cfg)
 
-
-def simulate_data(bars=500):
-    """Genera datos falsos (simulados) para pruebas sin MT5."""
+def simulate_data(bars=500, cfg=CONFIG):
+    """Genera datos falsos (simulados) para pruebas sin MT5, usando capital y riesgo de cfg."""
     np.random.seed(42)
     dates = pd.date_range(end=pd.Timestamp.now(), periods=bars, freq="1min")
-    prices = np.cumsum(np.random.randn(bars)) + 100
+    base_price = cfg.get("base_price", 100)  # precio base configurado
+    prices = np.cumsum(np.random.randn(bars)) + base_price
     df = pd.DataFrame({
         "Datetime": dates,
         "Open": prices + np.random.randn(bars),
@@ -47,11 +48,10 @@ def simulate_data(bars=500):
     })
     return df
 
-
-def place_trade(symbol, trade_type, price, volume=0.01, take_profit=None, stop_loss=None):
+def place_trade(symbol, trade_type, price, volume=0.01, take_profit=None, stop_loss=None, cfg=CONFIG):
     """Ejecuta una orden en MT5 o imprime simulación."""
     if not MT5_AVAILABLE:
-        print(f"💻 Simulación: {trade_type} {symbol} @ {price:.5f} (vol {volume})")
+        print(f"💻 Simulación: {trade_type.upper()} {symbol} @ {price:.5f} (vol {volume})")
         return True
 
     if not mt5.initialize():

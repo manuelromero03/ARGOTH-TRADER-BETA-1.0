@@ -6,34 +6,26 @@ except Exception as e:
     raise ImportError("MetaTrader5 no disponible en este entorno.") from e
 from connect_mt5 import connect_mt5
 
-def connect_mt5(cfg):
-    import MetaTrader5 as mt5
-    mt5.shutdown()
-    if not mt5.initialize(
-        login=cfg["mt5"]["login"],
-        password=cfg["mt5"]["password"],
-        server=cfg["mt5"]["server"]
-    ):
-        print("❌ Error: No se pudo conectar a MT5.")
-        return False
-    print(f"✅ Conectado a MT5 (servidor verificado) con login ****{str(cfg['mt5']['login'])[-3:]}")
-    return True
-
-def get_historical_data(symbol="EURUSD", timeframe=mt5.TIMEFRAME_M1, bars=500):
-    if not connect_mt5():
+def get_historical_data(cfg, symbol="EURUSD", timeframe=mt5.TIMEFRAME_M1, bars=500):
+    """Obtiene datos históricos desde MT5 usando la configuración pasada"""
+    if not connect_mt5(cfg):
         return pd.DataFrame()
+    
     rates = mt5.copy_rates_from_pos(symbol, timeframe, 0, bars)
     mt5.shutdown()
+    
     if rates is None:
         return pd.DataFrame()
+    
     df = pd.DataFrame(rates)
-    # convertir nombres a capitalizados para compatibilidad
-    df = df.rename(columns={"time": "Datetime", "open": "Open", "high": "High", "low": "Low", "close": "Close", "tick_volume": "Volume"})
+    df = df.rename(columns={"time": "Datetime", "open": "Open", "high": "High", 
+                            "low": "Low", "close": "Close", "tick_volume": "Volume"})
     df["Datetime"] = pd.to_datetime(df["Datetime"], unit="s")
     return df
 
-def place_trade(symbol, trade_type, price, volume=0.01, take_profit=None, stop_loss=None):
-    if not connect_mt5():
+def place_trade(cfg, symbol, trade_type, price, volume=0.01, take_profit=None, stop_loss=None):
+    """Envía trade a MT5 usando la configuración pasada"""
+    if not connect_mt5(cfg):
         print("❌ No se pudo inicializar MT5")
         return False
 
@@ -71,10 +63,9 @@ def place_trade(symbol, trade_type, price, volume=0.01, take_profit=None, stop_l
     print(f"💹 Trade enviado a MT5: {trade_type} {symbol} @ {price} (vol {volume})")
     return True
 
-def get_account_balance():
-    """Retorna el balance actual de la cuenta MT5, demo o real"""
-    if not mt5.initialize():
-        print("❌ No se pudo inicializar MT5")
+def get_account_balance(cfg):
+    """Retorna el balance actual de la cuenta MT5 usando la configuración"""
+    if not connect_mt5(cfg):
         return None
 
     account_info = mt5.account_info()

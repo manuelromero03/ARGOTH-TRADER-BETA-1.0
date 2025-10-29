@@ -111,8 +111,17 @@ class TradeManager:
         # ===== 6) Calcular lote y registrar métricas de riesgo siempre =====
         stop_loss_pips = self.cfg.get("stop_loss_pips", 50)
         pip_value = self.cfg.get("pip_value", 10)
-        last_price = data["close"].iloc[-1] if "close" in data.columns else data.iloc[-1, 0]
-
+        
+        #Obtener ultimo precio de cierre como float
+        if "close" in data.colums:
+            last_price = float(data["close"].iloc[-1])
+        else:
+            #Si no hay columna 'close', tomamos la primera columna numerica disponible
+            numeric_cols = data.select_dtypes(include=['float', 'int']).columns
+            if len(numeric_cols) == 0:
+                raise ValueError("No se encontro ninguna columna numerica para calcular el precio")
+            last_price = float(data[numeric_cols[-1]].iloc[-1])
+            
         lot = self.risk_manager.calculate_lot_size(
             price=last_price,
             stop_loss_pips=stop_loss_pips,
