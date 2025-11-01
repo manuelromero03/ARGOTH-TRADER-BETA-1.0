@@ -123,3 +123,6 @@
 2025-11-01 14:15:07.229920 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
 2025-11-01 14:15:17.249359 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
 2025-11-01 14:15:27.269894 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+[2025-11-01 14:15:33] PULSE: 🧩Commit existoso registrado en rama branch.
+[2025-11-01 14:15:33] ERROR: No se pudo leer last_commit.json: type object 'datetime.datetime' has no attribute 'strip'
+[2025-11-01 14:15:33] PULSE: 🧩 ARGOTH actualizado correctamente (commit exitoso).
