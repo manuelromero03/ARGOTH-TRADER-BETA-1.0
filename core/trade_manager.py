@@ -113,7 +113,7 @@ class TradeManager:
         pip_value = self.cfg.get("pip_value", 10)
         
         #Obtener ultimo precio de cierre como float
-        if "close" in data.colums:
+        if "close" in data.columns:
             last_price = float(data["close"].iloc[-1])
         else:
             #Si no hay columna 'close', tomamos la primera columna numerica disponible
