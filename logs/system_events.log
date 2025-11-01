@@ -58,3 +58,68 @@
 [2025-10-29 15:12:14] PULSE: 🧩Commit existoso registrado en rama branch.
 [2025-10-29 15:12:14] ERROR: No se pudo leer last_commit.json: type object 'datetime.datetime' has no attribute 'strip'
 [2025-10-29 15:12:14] PULSE: 🧩 ARGOTH actualizado correctamente (commit exitoso).
+[2025-11-01 14:04:52] PULSE: 🧩Commit existoso registrado en rama branch.
+[2025-11-01 14:04:52] ERROR: No se pudo leer last_commit.json: type object 'datetime.datetime' has no attribute 'strip'
+[2025-11-01 14:04:52] PULSE: 🧩 ARGOTH actualizado correctamente (commit exitoso).
+2025-11-01 14:05:15.975419 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:05:25.996716 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:05:36.017926 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:05:46.038171 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:05:56.057150 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:06:06.078957 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:06:16.145560 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:06:26.176144 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:06:36.194801 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:06:46.214040 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:06:56.235047 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:07:06.253917 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:07:16.273542 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:07:26.292141 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:07:36.312827 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:07:46.331575 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:07:56.350895 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:08:06.370510 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:08:16.391853 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:08:26.416762 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:08:36.438176 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:08:46.458406 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:08:56.476963 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:09:06.498393 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:09:16.517335 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:09:26.536031 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:09:36.555302 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:09:46.577677 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:09:56.597438 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:10:06.617561 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:10:16.646828 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:10:26.665890 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:10:36.685285 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:10:46.708038 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:10:56.727319 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:11:06.747927 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:11:16.767233 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:11:26.785872 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:11:36.804820 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:11:46.823839 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:11:56.843901 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:12:06.863828 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:12:16.883260 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:12:26.902111 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:12:36.922574 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:12:46.940683 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:12:56.959385 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:13:06.978494 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:13:16.998808 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:13:27.018774 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:13:37.040041 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:13:47.059372 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:13:57.077654 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:14:07.096267 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:14:17.133730 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:14:27.155229 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:14:37.174088 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:14:47.192898 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:14:57.211581 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:15:07.229920 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:15:17.249359 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
+2025-11-01 14:15:27.269894 | EURUSD | Price: 50.426791099868346 | Calculated lot: 0.02 | Capital disponible: 1000.00 | Riesgo por trade: 1.00%
